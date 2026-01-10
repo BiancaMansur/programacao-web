@@ -1,0 +1,493 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API Gestão Escolar - Knex.js",
+    "description": "Documentação da API desenvolvida com Express, Knex.js e PostgreSQL no Docker.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Servidor Local"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Aluno": {
+        "type": "object",
+        "required": [
+          "nome",
+          "email"
+        ],
+        "properties": {
+          "nome": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "Curso": {
+        "type": "object",
+        "required": [
+          "nome",
+          "cargaHoraria"
+        ],
+        "properties": {
+          "nome": {
+            "type": "string"
+          },
+          "cargaHoraria": {
+            "type": "integer"
+          }
+        }
+      },
+      "Usuario": {
+        "type": "object",
+        "required": [
+          "username",
+          "password",
+          "perfil_id"
+        ],
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "perfil_id": {
+            "type": "integer",
+            "description": "1 para admin, 2 para aluno"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/registrar": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Cria um novo usuário de sistema",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Usuario"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuário criado com sucesso"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Realiza login e retorna o Token JWT",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login realizado com sucesso"
+          },
+          "401": {
+            "description": "Credenciais inválidas"
+          }
+        }
+      }
+    },
+    "/alunos": {
+      "get": {
+        "tags": [
+          "Alunos"
+        ],
+        "summary": "Lista todos os alunos (Knex)",
+        "responses": {
+          "200": {
+            "description": "Lista de alunos retornada com sucesso"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Alunos"
+        ],
+        "summary": "Cadastra um novo aluno (Apenas Admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Aluno"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Aluno criado com sucesso"
+          },
+          "401": {
+            "description": "Não autorizado"
+          },
+          "403": {
+            "description": "Proibido: Requer perfil admin"
+          }
+        }
+      }
+    },
+    "/alunos/{id}": {
+      "get": {
+        "tags": [
+          "Alunos"
+        ],
+        "summary": "Busca um aluno específico por ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Aluno encontrado"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Alunos"
+        ],
+        "summary": "Atualiza dados de um aluno (Apenas Admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Aluno"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Atualizado"
+          },
+          "403": {
+            "description": "Acesso negado"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Alunos"
+        ],
+        "summary": "Remove um aluno do sistema (Apenas Admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Removido"
+          },
+          "403": {
+            "description": "Acesso negado"
+          }
+        }
+      }
+    },
+    "/cursos": {
+      "get": {
+        "tags": [
+          "Cursos"
+        ],
+        "summary": "Lista todos os cursos",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Cursos"
+        ],
+        "summary": "Cria um novo curso (Apenas Admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Curso"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Criado"
+          },
+          "403": {
+            "description": "Acesso negado"
+          }
+        }
+      }
+    },
+    "/cursos/{id}": {
+      "get": {
+        "tags": [
+          "Cursos"
+        ],
+        "summary": "Busca um curso específico",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Cursos"
+        ],
+        "summary": "Atualiza um curso (Apenas Admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Curso"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Atualizado"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Cursos"
+        ],
+        "summary": "Remove um curso (Apenas Admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Removido"
+          }
+        }
+      }
+    },
+    "/matricular": {
+      "post": {
+        "tags": [
+          "Matrículas"
+        ],
+        "summary": "Matricular aluno (Apenas Perfil Aluno)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "alunoId": {
+                    "type": "integer"
+                  },
+                  "cursoId": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Matriculado com sucesso"
+          },
+          "403": {
+            "description": "Acesso negado: Requer perfil aluno"
+          }
+        }
+      }
+    },
+    "/listar-matriculas/{id_aluno}": {
+      "get": {
+        "tags": [
+          "Matrículas"
+        ],
+        "summary": "Busca todos os cursos vinculados a um aluno",
+        "parameters": [
+          {
+            "name": "id_aluno",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista retornada"
+          }
+        }
+      }
+    },
+    "/matriculas": {
+      "get": {
+        "tags": [
+          "Matrículas"
+        ],
+        "summary": "Lista geral de todas as matrículas",
+        "responses": {
+          "200": {
+            "description": "Sucesso"
+          }
+        }
+      }
+    },
+    "/matriculas/{id}": {
+      "delete": {
+        "tags": [
+          "Matrículas"
+        ],
+        "summary": "Cancela/Deleta uma matrícula por ID (Apenas Admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Matrícula cancelada"
+          }
+        }
+      }
+    }
+  }
+}
