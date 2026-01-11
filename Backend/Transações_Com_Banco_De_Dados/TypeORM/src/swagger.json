@@ -1,0 +1,155 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API Gestão Escolar - TypeORM",
+    "description": "Documentação da API utilizando TypeORM com suporte nativo a transações via QueryRunner.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Servidor Local"
+    }
+  ],
+  "paths": {
+    "/api/alunos": {
+      "get": {
+        "tags": ["Alunos"],
+        "summary": "Lista todos os alunos cadastrados",
+        "responses": { "200": { "description": "OK" } }
+      },
+      "post": {
+        "tags": ["Alunos"],
+        "summary": "Cadastra novo aluno (Gatilho Rollback: nome='Erro')",
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AlunoInput" } } }
+        },
+        "responses": { 
+          "201": { "description": "Aluno criado com sucesso via transação" },
+          "400": { "description": "Erro na transação ou dados inválidos" }
+        }
+      }
+    },
+    "/api/alunos/{id}": {
+      "get": {
+        "tags": ["Alunos"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "OK" } }
+      },
+      "put": {
+        "tags": ["Alunos"],
+        "summary": "Atualiza aluno (Operação Transacional)",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AlunoInput" } } }
+        },
+        "responses": { "200": { "description": "OK" } }
+      },
+      "delete": {
+        "tags": ["Alunos"],
+        "summary": "Remove aluno (Operação Transacional)",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "204": { "description": "OK" } }
+      }
+    },
+    "/api/cursos": {
+      "get": {
+        "tags": ["Cursos"],
+        "summary": "Lista todos os cursos",
+        "responses": { "200": { "description": "OK" } }
+      },
+      "post": {
+        "tags": ["Cursos"],
+        "summary": "Cria novo curso (Gatilho Rollback: carga_horaria=1000)",
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CursoInput" } } }
+        },
+        "responses": { "201": { "description": "Curso criado com sucesso via transação" } }
+      }
+    },
+    "/api/cursos/{id}": {
+      "get": {
+        "tags": ["Cursos"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "OK" } }
+      },
+      "put": {
+        "tags": ["Cursos"],
+        "summary": "Atualiza curso (Operação Transacional)",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CursoInput" } } }
+        },
+        "responses": { "200": { "description": "OK" } }
+      },
+      "delete": {
+        "tags": ["Cursos"],
+        "summary": "Remove curso (Operação Transacional)",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "204": { "description": "OK" } }
+      }
+    },
+    "/api/matriculas": {
+      "get": {
+        "tags": ["Matrículas"],
+        "summary": "Lista todas as matrículas com relações",
+        "responses": { "200": { "description": "OK" } }
+      },
+      "post": {
+        "tags": ["Matrículas"],
+        "summary": "Realiza matrícula (Gatilho Rollback: alunoId=777)",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "alunoId": { "type": "integer" },
+                  "cursoId": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { 
+          "201": { "description": "Matrícula atômica realizada" },
+          "400": { "description": "Falha na validação ou na transação" }
+        }
+      }
+    },
+    "/api/matriculas/{id}": {
+      "delete": {
+        "tags": ["Matrículas"],
+        "summary": "Cancela matrícula (Operação Transacional)",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "204": { "description": "OK" } }
+      }
+    },
+    "/api/listar-matriculas/{id_aluno}": {
+      "get": {
+        "tags": ["Matrículas"],
+        "summary": "Busca matrículas filtradas por aluno",
+        "parameters": [{ "name": "id_aluno", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "OK" } }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AlunoInput": {
+        "type": "object",
+        "properties": {
+          "nome": { "type": "string" },
+          "email": { "type": "string" }
+        }
+      },
+      "CursoInput": {
+        "type": "object",
+        "properties": {
+          "nome_curso": { "type": "string" },
+          "carga_horaria": { "type": "integer" }
+        }
+      }
+    }
+  }
+}
