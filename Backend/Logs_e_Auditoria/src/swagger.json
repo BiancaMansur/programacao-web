@@ -1,0 +1,226 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API em Camadas com Swagger",
+    "description": "Exemplo de sistema de gestão escolar com arquitetura Controller, Service e Repository.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Servidor Local"
+    }
+  ],
+  "paths": {
+    "/api/alunos": {
+      "get": {
+        "summary": "Lista todos os alunos",
+        "tags": ["Alunos"],
+        "responses": {
+          "200": { "description": "Sucesso ao listar alunos" }
+        }
+      },
+      "post": {
+        "summary": "Cadastra um novo aluno",
+        "tags": ["Alunos"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": { "type": "string", "example": "João Silva" },
+                  "email": { "type": "string", "format": "email", "example": "joao@email.com" }
+                },
+                "required": ["nome", "email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Aluno criado com sucesso" },
+          "400": { "description": "Erro de validação (Campos obrigatórios ausentes)" }
+        }
+      }
+    },
+    "/api/alunos/{id}": {
+      "get": {
+        "summary": "Busca aluno por ID",
+        "tags": ["Alunos"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Aluno encontrado" },
+          "404": { "description": "Aluno não encontrado" }
+        }
+      },
+      "put": {
+        "summary": "Atualiza um aluno",
+        "tags": ["Alunos"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": { "type": "string" },
+                  "email": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Aluno atualizado com sucesso" },
+          "400": { "description": "Erro ao atualizar dados" },
+          "404": { "description": "Aluno não encontrado" }
+        }
+      },
+      "delete": {
+        "summary": "Remove um aluno",
+        "tags": ["Alunos"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "204": { "description": "Aluno removido com sucesso" },
+          "400": { "description": "Erro ao tentar remover" },
+          "404": { "description": "Aluno não encontrado" }
+        }
+      }
+    },
+    "/api/cursos": {
+      "get": {
+        "summary": "Lista todos os cursos",
+        "tags": ["Cursos"],
+        "responses": {
+          "200": { "description": "Sucesso ao listar cursos" }
+        }
+      },
+      "post": {
+        "summary": "Cadastra um novo curso",
+        "tags": ["Cursos"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": { "type": "string", "example": "Matemática Financeira" },
+                  "cargaHoraria": { "type": "integer", "example": 40 }
+                },
+                "required": ["nome", "cargaHoraria"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Curso criado com sucesso" },
+          "400": { "description": "Erro de validação (Campos obrigatórios ausentes)" }
+        }
+      }
+    },
+    "/api/cursos/{id}": {
+      "get": {
+        "summary": "Busca curso por ID",
+        "tags": ["Cursos"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Curso encontrado" },
+          "404": { "description": "Curso não encontrado" }
+        }
+      },
+      "put": {
+        "summary": "Atualiza um curso",
+        "tags": ["Cursos"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": { "type": "string" },
+                  "cargaHoraria": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Curso atualizado com sucesso" },
+          "400": { "description": "Erro ao atualizar curso" },
+          "404": { "description": "Curso não encontrado" }
+        }
+      },
+      "delete": {
+        "summary": "Remove um curso",
+        "tags": ["Cursos"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "204": { "description": "Curso removido com sucesso" },
+          "404": { "description": "Curso não encontrado" }
+        }
+      }
+    },
+    "/api/matriculas": {
+      "get": {
+        "summary": "Lista todas as matrículas",
+        "tags": ["Matrículas"],
+        "responses": {
+          "200": { "description": "Sucesso ao listar matrículas" },
+          "500": { "description": "Erro interno do servidor" }
+        }
+      },
+      "post": {
+        "summary": "Realiza matrícula (Regra: 1 Aluno -> N Cursos)",
+        "description": "Vincula um aluno a um curso. Não permite duplicidade.",
+        "tags": ["Matrículas"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "alunoId": { "type": "integer", "example": 1 },
+                  "cursoId": { "type": "integer", "example": 10 }
+                },
+                "required": ["alunoId", "cursoId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Matrícula realizada com sucesso" },
+          "400": { "description": "Erro: Aluno/Curso inexistente ou Aluno já matriculado" }
+        }
+      }
+    },
+    "/api/matriculas/{id}": {
+      "delete": {
+        "summary": "Cancela uma matrícula",
+        "tags": ["Matrículas"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "204": { "description": "Matrícula cancelada com sucesso" },
+          "404": { "description": "Matrícula não encontrada" }
+        }
+      }
+    }
+  }
+}
