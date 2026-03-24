@@ -1,0 +1,22 @@
+{
+  "name": "quarta-api-knex",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^4.x.x",
+    "pg": "^8.x.x",
+    "pg-hstore": "^2.x.x",
+    "sequelize": "^6.x.x"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.6.5"
+  }
+}
